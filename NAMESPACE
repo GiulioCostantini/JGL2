@@ -1,0 +1,8 @@
+#exportPattern("^[[:alpha:]]+")
+
+export(AIC_jgl, JGL_AIC_sequentialsearch, JGL_AIC_widesearch, JGL_cv, JGL_AIC_surfaceplot)
+importFrom("parallel", "makeCluster", "clusterExport", "parApply", "parSapply", "parLapply")
+importFrom("JGL", "JGL")
+importFrom("car", "scatter3d")
+importFrom("MASS", "mvrnorm")
+importFrom("corpcor", "cor2pcor")
