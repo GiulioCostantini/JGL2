@@ -43,7 +43,7 @@ Other parameters for \code{link{JGL}}. This feature is still in development, it 
 \item{lambda1}{the value of lambda 1 that minimizes the output of aicfun}
 \item{l1theormax}{the minimal value of lambda 1 that would result in at least one completely disconnected network (all missing edges). Values of lambda 1 > l1theormax are not considered}
 \item{l2theormax}{for each candidate value of lambda 1, the minimal value of lambda 2 that would make the networks in the different classes all equal to each other. For each lambda 1, values of lambda 2 > l2theormax are not considered}
-\item{aic}{The Akaike Information Criterion (or another criterion to minimize passed to \code{aicfun}) corresponding to the solution in \code{jgl}}
+\item{aic}{The Akaike Information Criterion (or the output of another function passed to \code{aicfun}) corresponding to the solution in \code{jgl}}
 }
 \references{
 Danaher, P., Wang, P., & Witten, D. M. (2014). The joint graphical lasso for inverse covariance estimation across multiple classes. Journal of the Royal Statistical Society: Series B (Statistical Methodology), 76(2), 373-397. http://doi.org/10.1111/rssb.12033
