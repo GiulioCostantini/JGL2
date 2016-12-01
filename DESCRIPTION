@@ -4,7 +4,7 @@ Date: 2016-07-26
 Title: JGL2: Joint Graphical Lasso, select the lambda parameters using AIC or crossvalidation 
 Author: Giulio Costantini [aut, cre]
 Maintainer: Giulio Costantini <giulio.costantini@unimib.it>
-Depends: R (>= 3.3.1)
+Depends: R (>= 3.2.3)
 Description: This package selects the lambda parameters for the Joint grapical lasso with different methods, based on AIC or on k-fold crossvalidation
 License: GPL (>=2)
 Imports: JGL, car, parallel, MASS, corpcor

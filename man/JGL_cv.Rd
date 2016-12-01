@@ -23,7 +23,7 @@ Integer. number of values for lambda 1 and for lambda 2
 Numeric. Maximum value of the lasso parameter lambda2
 }
   \item{seed}{
-seed parameter that ensures the exact reproducibility of the results obtained through the k-fold crossvalidation 
+seed parameter that ensures the exact reproducibility of the results obtained through the k-fold crossvalidation. If Missing the seed is not set (this is good for bootstrapping and similar things)
 }
   \item{k}{
 number of splits for the k-fold crossvalidation

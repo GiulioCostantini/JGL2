@@ -98,7 +98,7 @@ JGL_cv <- function(dat, splt, ncand = 20, l2max = 10, seed = 1, k = 10, ncores =
   # some of the code for the k-fold cross validation has been taken from the R package parcor, function adalasso
   n <- sapply(dat, nrow)
   nclasses <- length(dat)
-  set.seed(seed)
+  if(!missing(seed)) set.seed(seed)
   # all 
   all.folds <- lapply(n, function(x) split(sample(1:x), rep(1:k, length = x)))
   
