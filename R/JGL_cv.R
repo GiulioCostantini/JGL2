@@ -12,8 +12,8 @@
 # 
 # 
 # dat <- list()
-# dat[[1]] <- MASS::mvrnorm(n = N, mu = rep(0, ncol(sigma1)), Sigma = sigma1)
-# dat[[2]] <- MASS::mvrnorm(n = N, mu = rep(0, ncol(sigma2)), Sigma = sigma2)
+# dat[[1]] <- MASS::mvrnorm(n = N, mu = rep(0, ncol(sigma1)), Sigma = solve(sigma1))
+# dat[[2]] <- MASS::mvrnorm(n = N, mu = rep(0, ncol(sigma2)), Sigma = solve(sigma2))
 # lapply(dat, function(x) corpcor::cor2pcor(cor(x)))
 # dat <- data.frame(rbind(dat[[1]], dat[[2]]))
 # dat$splt <- c(rep(1, N), rep(2, N))
@@ -25,7 +25,7 @@
 
   
 # select lasso parameters through k-fold crossvalidation
-JGL_cv <- function(dat, splt, ncand = 20, l2max = 10, seed = 1, k = 10, ncores = 1, aicfun = AIC_jgl, ...)
+JGL_cv <- function(dat, splt, ncand = 20, l2max = 10, seed, k = 10, ncores = 1, aicfun = AIC_jgl, ...)
   
   # dat = a dataframe
   # splt = the column of the dataframe dat that defines multiple classes

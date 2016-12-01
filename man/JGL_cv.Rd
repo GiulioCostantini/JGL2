@@ -7,7 +7,7 @@ Joint Graphical Lasso with k-fold crossvalidation
 Fits a Joint Graphical Lasso model. The lambda 1 and lambda 2 parameters are identified through k-fold crossvalidation. The cost function for the k-fold crossvalidation procedure is the average predictive negative loglikelihood, as defined in Guo et al. (2011, p.5)
 }
 \usage{
-JGL_cv(dat, splt, ncand = 20, l2max = 10, seed = 1, k = 10, ncores = 1, aicfun = AIC_jgl, ...)
+JGL_cv(dat, splt, ncand = 20, l2max = 10, seed, k = 10, ncores = 1, aicfun = AIC_jgl, ...)
 }
 \arguments{
 \item{dat}{
