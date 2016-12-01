@@ -1,20 +1,20 @@
-# # a toy example
+# # a toy example - have to fix this
 # N <- 1000 # sample size
 # sigma1 <- matrix(c(1, .5, 0, 0,
 #                   .5, 1, .2, 0,
 #                   0, .2, 1, 0,
 #                   0, 0, 0, 1), ncol = 4)
-# 
+#
 # sigma2 <- matrix(c(1, .5, .4, .4,
 #                    .5, 1, .2, 0,
 #                    .4, .2, 1, 0,
 #                    .4, 0, 0, 1), ncol = 4)
-# 
+#
 # sigma3 <- matrix(c(1, .5, 0, 0,
 #                     .5, 1, .2, .1,
 #                     0, .2, 1, 0,
 #                     0, 0, .1, 1), ncol = 4)
-# 
+#
 # dat <- list()
 # dat[[1]] <- MASS::mvrnorm(n = N, mu = rep(0, ncol(sigma1)), Sigma = solve(sigma1))
 # dat[[2]] <- MASS::mvrnorm(n = N, mu = rep(0, ncol(sigma2)), Sigma = solve(sigma2))
@@ -23,14 +23,14 @@
 # S <- lapply(dat, function(x) corpcor::cor2pcor(cor(x)))
 # dat <- data.frame(rbind(dat[[1]], dat[[2]], dat[[3]]))
 # dat$splt <- c(rep(1, N), rep(2, N), rep(3, N))
-# 
+#
 # jgl <- JGL_AIC_sequentialsearch(dat = dat, splt = "splt", ncores = 3, aicfun = AIC_jgl2)
 
 # parallelization does not seem doing good here, perhaps the example is too simple!
 # system.time(
 #  JGL_AIC_sequentialsearch(dat = dat, splt = "splt", ncores = 7)
 # )
-# 
+#
 # system.time(
 #  JGL_AIC_sequentialsearch(dat = dat, splt = "splt", ncores = 1)
 # )
@@ -39,8 +39,8 @@
 # then it finds the best value of l2 given the l1 selected at the first stage.
 # Optionally, it can use the values of l1 and l2 as the input for a 2-dimensional optimization, to search if the aicfun can be further improved.
 
-JGL_AIC_sequentialsearch <- function(dat, splt, return.whole.theta = TRUE, l1min = 0, l1max = 1, l2min = 0, l2max = 1, ncand = 20, aicfun = AIC_jgl, globalopt = TRUE, optmethod = "CG", ncores = 1, ...)
-  
+JGL_AIC_sequentialsearch <- function(dat, splt, return.whole.theta = TRUE, l1min = 0, l1max = 1, l2min = 0, l2max = 1, ncand = 20, criterion = c("ebic","aic"), gamma = 0.5, globalopt = TRUE, optmethod = "CG", ncores = 1, ...)
+
   # dat = a dataframe
   # splt = the column of the dataframe dat that defines multiple classes
   # return.whole.theta = see JGL
@@ -51,6 +51,11 @@ JGL_AIC_sequentialsearch <- function(dat, splt, return.whole.theta = TRUE, l1min
   # optmethod = parameter method to be passed to optim
   # ... = Other parameters to be passed to JGL (may not work well for parallelized code!!)
 {
+  
+    
+  criterion = match.arg(criterion)
+  aicfun = switch(criterion, aic = AIC_jgl, ebic = BIC_jgl)
+  
   # standardize data data within classes
   sp <- split(dat[, !names(dat) == splt], dat[, splt])
   sp_sc <- lapply(sp, scale)
@@ -79,13 +84,13 @@ JGL_AIC_sequentialsearch <- function(dat, splt, return.whole.theta = TRUE, l1min
   fun <- function(lambda1, ...)
   {
     jgl <- JGL(Y = dat, lambda1 = lambda1, lambda2 = l2min, return.whole.theta = TRUE, ...)
-    aicfun(jgl = jgl, n = n, S = S)
+    aicfun(jgl = jgl, n = n, S = S, gamma = gamma)
   }
   
   if(ncores > 1)
   {
     cl <- makeCluster(ncores)
-    clusterExport(cl, list("fun", "dat", "n", "S", "JGL", "l1cand", "l2min", "aicfun"), envir = environment())
+    clusterExport(cl, list("fun", "dat", "n", "S", "JGL", "l1cand", "l2min", "aicfun", "gamma"), envir = environment())
     aicsl1 <- parSapply(cl = cl, l1cand, fun)  
     stopCluster(cl)
   } else {
@@ -135,13 +140,13 @@ JGL_AIC_sequentialsearch <- function(dat, splt, return.whole.theta = TRUE, l1min
   fun <- function(lambda2, ...)
   {
     jgl <- JGL(Y = dat, lambda1 = lambda1, lambda2 = lambda2, return.whole.theta = TRUE, ...)
-    aicfun(jgl = jgl, n = n, S = S)
+    aicfun(jgl = jgl, n = n, S = S, gamma = gamma)
   }
   
   if(ncores > 1)
   {
     cl <- makeCluster(ncores)
-    clusterExport(cl, list("fun", "dat", "lambda1", "n", "S", "JGL", "l2cand", "aicfun"), envir = environment())
+    clusterExport(cl, list("fun", "dat", "lambda1", "n", "S", "JGL", "l2cand", "aicfun", "gamma"), envir = environment())
     aicsl2 <- parSapply(cl = cl, l2cand, fun) 
     stopCluster(cl)
   } else {
@@ -165,7 +170,7 @@ JGL_AIC_sequentialsearch <- function(dat, splt, return.whole.theta = TRUE, l1min
     {
       if(any(lambda < 0)) return(averylargenumber)
       jgl <- JGL(Y = dat, lambda1 = lambda[1], lambda2 = lambda[2], return.whole.theta = TRUE, ...)
-      aicfun(jgl = jgl, n = n, S = S)
+      aicfun(jgl = jgl, n = n, S = S, gamma = gamma)
     }
     
     opt <- optim(par = c(startl1, startl2), fun, method = "BFGS")
@@ -178,7 +183,7 @@ JGL_AIC_sequentialsearch <- function(dat, splt, return.whole.theta = TRUE, l1min
   jgl <- JGL(Y = dat, lambda1 = lambda1, lambda2 = lambda2, return.whole.theta = return.whole.theta, ...)
   
   names(jgl$theta) <- names(dat)
-  aic <- aicfun(jgl, n, S)
+  aic <- aicfun(jgl, n, S, gamma = gamma)
   
   # return 
   list("jgl" = jgl,

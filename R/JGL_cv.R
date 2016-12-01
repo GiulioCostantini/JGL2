@@ -50,7 +50,7 @@ JGL_cv <- function(dat, splt, ncand = 20, l2max = 10, seed, k = 10, ncores = 1, 
   
   # define an equally  spaced sequence of candidate l1, between 0 and l1_theormax. 
   l1cand <- seq(from = 0, to = l1_theormax, length.out = ncand)
-
+ 
   ######################################
   # find candidate values of l1 and l2 #
   ######################################

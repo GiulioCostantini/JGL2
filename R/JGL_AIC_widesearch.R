@@ -23,7 +23,7 @@
 # This function performs a grid search over ncand values of l1 and l2. For each pair of values, it tries to find the minimum value of a criteiron (AIC/BIC)
 # using optimization. Since the problem seems not convex, considering many starting values for l1 and l2 helps escaping local minima,
 # however it is also computationally *very* intensive
-JGL_AIC_widesearch <- function(dat, splt, return.whole.theta = TRUE, l1min = 0, l1max = 1, l2min = 0, l2max = 1, ncand = 20, aicfun = AIC_jgl, optmethod = "CG", ncores = 1, ...)
+JGL_AIC_widesearch <- function(dat, splt, return.whole.theta = TRUE, l1min = 0, l1max = 1, l2min = 0, l2max = 1, ncand = 20, criterion = c("ebic","aic"), gamma = 0.5, optmethod = "CG", ncores = 1, ...)
   
   # dat = a dataframe
   # splt = the column of the dataframe dat that defines multiple classes
@@ -35,6 +35,10 @@ JGL_AIC_widesearch <- function(dat, splt, return.whole.theta = TRUE, l1min = 0, 
   # ncores = the function is now parallelized for windows systems. Ncores determines how many cores are used. I don't know hot it performs on other OSs, e.g., linux, mac.
   # ... = Other parameters to be passed to JGL (may not work well for parallelized code!!)
 {
+  
+  criterion = match.arg(criterion)
+  aicfun = switch(criterion, aic = AIC_jgl, ebic = BIC_jgl)
+  
 
   # standardize data data within classes
   sp <- split(dat[, !names(dat) == splt], dat[, splt])
@@ -101,13 +105,13 @@ JGL_AIC_widesearch <- function(dat, splt, return.whole.theta = TRUE, l1min = 0, 
     averylargenumber <- 1e10
     if(any(lambda < 0)) return(averylargenumber)
     jgl <- JGL(Y = dat, lambda1 = lambda[1], lambda2 = lambda[2], return.whole.theta = TRUE, ...)
-    aicfun(jgl = jgl, n = n, S = S)
+    aicfun(jgl = jgl, n = n, S = S, gamma = gamma)
   }
   
   if(ncores > 1)
   {
     cl <- makeCluster(ncores)
-    clusterExport(cl, list("fun", "lambdas", "aicfun", "JGL", "dat", "n", "S"), envir = environment())
+    clusterExport(cl, list("fun", "lambdas", "aicfun", "JGL", "dat", "n", "S", "gamma"), envir = environment())
     opt <- parApply(cl = cl, lambdas, 1, optim, fun, method = optmethod)
     stopCluster(cl)
   }  else {
@@ -126,7 +130,7 @@ JGL_AIC_widesearch <- function(dat, splt, return.whole.theta = TRUE, l1min = 0, 
   jgl <- JGL(Y = dat, lambda1 = lambda1, lambda2 = lambda2, return.whole.theta = return.whole.theta, ...) 
   names(jgl$theta) <- names(dat)
   
-  aic <- aicfun(jgl, n, S)
+  aic <- aicfun(jgl, n, S, gamma = gamma)
   
   # return 
   list("jgl" = jgl,
