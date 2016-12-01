@@ -1,4 +1,4 @@
-# a toy example
+# # a toy example
 # N <- 1000 # sample size
 # sigma1 <- matrix(c(1, .5, 0, 0,
 #                   .5, 1, .2, 0,
@@ -10,14 +10,21 @@
 #                    .4, .2, 1, 0,
 #                    .4, 0, 0, 1), ncol = 4)
 # 
+# sigma3 <- matrix(c(1, .5, 0, 0,
+#                     .5, 1, .2, .1,
+#                     0, .2, 1, 0,
+#                     0, 0, .1, 1), ncol = 4)
 # 
 # dat <- list()
-# dat[[1]] <- MASS::mvrnorm(n = N, mu = rep(0, ncol(sigma1)), Sigma = sigma1)
-# dat[[2]] <- MASS::mvrnorm(n = N, mu = rep(0, ncol(sigma2)), Sigma = sigma2)
-# lapply(dat, function(x) corpcor::cor2pcor(cor(x)))
-# dat <- data.frame(rbind(dat[[1]], dat[[2]]))
-# dat$splt <- c(rep(1, N), rep(2, N))
-# JGL_AIC_sequentialsearch(dat = dat, splt = "splt", ncores = 1)
+# dat[[1]] <- MASS::mvrnorm(n = N, mu = rep(0, ncol(sigma1)), Sigma = solve(sigma1))
+# dat[[2]] <- MASS::mvrnorm(n = N, mu = rep(0, ncol(sigma2)), Sigma = solve(sigma2))
+# dat[[3]] <- MASS::mvrnorm(n = N, mu = rep(0, ncol(sigma2)), Sigma = solve(sigma3))
+# n <- rep(N, length(dat))
+# S <- lapply(dat, function(x) corpcor::cor2pcor(cor(x)))
+# dat <- data.frame(rbind(dat[[1]], dat[[2]], dat[[3]]))
+# dat$splt <- c(rep(1, N), rep(2, N), rep(3, N))
+# 
+# jgl <- JGL_AIC_sequentialsearch(dat = dat, splt = "splt", ncores = 3, aicfun = AIC_jgl2)
 
 # parallelization does not seem doing good here, perhaps the example is too simple!
 # system.time(

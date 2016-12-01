@@ -34,6 +34,26 @@ AIC_jgl <- function(jgl, n, S)
 }
 
 
+AIC_jgl2 <- function(jgl, n, S, dec = 5)
+{
+  # jgl = output of JGL
+  # n = vector of sample sizes corresponding to each element of jgl (same order)
+  # S = list of covariance matrices corresponding to each element of jgl (same order)
+  # dec = edges are rounded to the dec decimal place when considering them different for computing the AIC
+  
+  # Formula 6.21 in Danaher et al. (2014) doi:10.1111/rssb.12033
+  # notice that sum(jgl$theta[[i]] * S[[i]]) is the same as sum(diag(jgl$theta[[i]] %*% S[[i]])) but requires much less computational time
+  # in AIC_jgl2 the parameters that are equal across classes under a certain tol value are counted only once and not once by class
+  L <- jgl$theta
+  arr <- array(unlist(L), dim = c(nrow(L[[1]]), ncol(L[[1]]), length(L)))
+  arr <- round(arr, dec)
+  Nuni <- apply(arr, 1:2, function(x) {un <- unique(x); length(un[un!=0])})
+  
+  aics <- sapply(1:length(jgl$theta),
+                 function(k) n[k] * sum(S[[k]]*jgl$theta[[k]]) - n[k] * log(det(jgl$theta[[k]]))) 
+  sum(aics) + 2*sum(Nuni[lower.tri(Nuni)])
+}
+
 BIC_jgl <- function(jgl, n, S)
 {
   # This is the formula in Guo et al., 2011
