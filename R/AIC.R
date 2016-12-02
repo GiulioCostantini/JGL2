@@ -62,41 +62,51 @@ logGaus <- function(S,K,n)
 }
 
 # Computes the EBIC:
-EBIC <- function(S,K,n,gamma = 0.5,E,countDiagonal=FALSE)
-{
-  #   browser()
-  L <- logGaus(S, K, n)
-  if (missing(E)){
-    E <- sum(K[lower.tri(K,diag=countDiagonal)] != 0)
-  }
-  p <- nrow(K)
-  
-  # return EBIC:
-  -2 * L + E * log(n) + 4 * E * gamma * log(p)  
-}
+# EBIC <- function(S,K,n,gamma = 0.5,E,countDiagonal=FALSE)
+# {
+#   #   browser()
+#   L <- logGaus(S, K, n)
+#   if (missing(E)){
+#     E <- sum(K[lower.tri(K,diag=countDiagonal)] != 0)
+#   }
+#   p <- nrow(K)
+#   
+#   # return EBIC:
+#   -2 * L + E * log(n) + 4 * E * gamma * log(p)  
+# }
 
-BIC_jgl <- function(jgl, n, S, gamma = 0)
+BIC_jgl <- function(jgl, n, S, gamma = 0, dec = 5)
 {
   # This is the formula in Guo et al., 2011
   # jgl = output of JGL
   # n = vector of sample sizes corresponding to each element of jgl (same order)
   # S = list of covariance matrices corresponding to each element of jgl (same order)
 
+  # Number of unique pars:
+  L <- jgl$theta
+  arr <- array(unlist(L), dim = c(nrow(L[[1]]), ncol(L[[1]]), length(L)))
+  arr <- round(arr, dec)
+  Nuni <- apply(arr, 1:2, function(x) {
+    un <- unique(x)
+    length(un[un!=0])
+    })
+                
+  # Number of pars:
+  E <- sum(Nuni[upper.tri(Nuni)])
+  
+  # Number of nodes:
+  p <- ncol(S[[1]])
+  
   # likelihoods
   Lik = numeric(length(S))
   EBIC = numeric(length(S))
   for (i in seq_along(S)){
-    
     Lik[i] = logGaus(S[[i]], jgl$theta[[i]], n[i])
-    EBIC[i]  =  EBIC(S[[i]], jgl$theta[[i]], n[i])
-    
   }
   
-  # 
-
-  # bics <- sapply(1:length(jgl$theta),
-  #                function(k) sum(S[[k]]*jgl$theta[[k]]) - log(det(jgl$theta[[k]])) +
-  #                  log(n[k])*sum(jgl$theta[[k]][lower.tri(jgl$theta[[k]])] != 0))
-  sum(EBIC)
+  # Sum likelihoods:
+  L <- sum(Lik)
   
+  # Get EBIC:
+  -2 * L + E * log(sum(n)) + 4 * E * gamma * log(p)  
 }
