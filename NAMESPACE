@@ -1,6 +1,6 @@
 #exportPattern("^[[:alpha:]]+")
 
-export(AIC_jgl, BIC_jgl, JGL_AIC_sequentialsearch, JGL_AIC_widesearch, JGL_cv, JGL_AIC_surfaceplot,BIC_jgl)
+export(AIC_jgl, JGL_AIC_sequentialsearch, JGL_AIC_widesearch, JGL_cv, JGL_AIC_surfaceplot,BIC_jgl)
 importFrom("parallel", "makeCluster", "clusterExport", "parApply", "parSapply", "parLapply", "stopCluster")
 importFrom("JGL", "JGL")
 importFrom("car", "scatter3d")

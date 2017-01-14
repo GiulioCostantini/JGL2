@@ -9,7 +9,7 @@ therefore ncand values of lambda1 x ncand values of lambda2 are considered. This
 The function is optimized for parallel computing on Windows machines. on Other OSs parallelization may not work, in this case, use ncores = 1.
 }
 \usage{
-JGL_AIC_widesearch(dat, splt, return.whole.theta = TRUE, l1min = 0, l1max = 1, l2min = 0, l2max = 1, ncand = 20, aicfun = AIC_jgl, optmethod = "CG", ncores = 1, ...)
+JGL_AIC_widesearch(dat, splt, return.whole.theta = TRUE, l1min = 0, l1max = 1, l2min = 0, l2max = 1, ncand = 20, criterion = c("ebic","aic"), gamma = 0.5, optmethod = "CG", ncores = 1, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -37,8 +37,11 @@ Numeric. Maximum value of the lasso parameter lambda2
   \item{ncand}{
 Integer. number of values for lambda 1 and for lambda 2
 }
-  \item{aicfun}{
-\code{AIC_jgl} or another function that take as input (1) the output of \code{JGL}, (2) n = vector of sample sizes, (3) S = list of covariance matrices and give in output a criterion to minimize
+  \item{criterion}{
+The criterion for selecting the lambda values. Can be "aic" for the Akaike information criterion (AIC) or "ebic" for the Extended Bayes Information Criterion (EBIC).
+}
+  \item{gamma}{
+The gamma value for the EBIC criterion. A value of 0 results in the BIC.
 }
   \item{optmethod}{
 character string. Determines the optimization method. See parameter \code{method} in function \code{\link{optim}}

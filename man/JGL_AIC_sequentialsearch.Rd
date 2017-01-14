@@ -7,7 +7,7 @@ Fits a Joint Graphical Lasso model. The lambda 1 and lambda 2 parameters are ide
 As suggested by Danaher et al. (2014), to save computational time the selection of the lambda parametes in Joint Graphical Lasso problems can be performed by doing a dense search over lambda1 while holding lambda2 at a fixed, low value, followed by a quick search over lambda2, holding lambda1 at the selected value.
 }
 \usage{
-JGL_AIC_sequentialsearch(dat, splt, return.whole.theta = TRUE, l1min = 0, l1max = 1, l2min = 0, l2max = 1, ncand = 20, aicfun = AIC_jgl, globalopt = TRUE, optmethod = "CG", ncores = 1, ...)
+JGL_AIC_sequentialsearch(dat, splt, return.whole.theta = TRUE, l1min = 0, l1max = 1, l2min = 0, l2max = 1, ncand = 20, criterion = c("ebic","aic"), gamma = 0.5, globalopt = TRUE, optmethod = "CG", ncores = 1, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -35,8 +35,11 @@ Numeric. Maximum value of the lasso parameter lambda2
   \item{ncand}{
 Integer. number of values for lambda 1 and for lambda 2
 }
-  \item{aicfun}{
-\code{AIC_jgl} or another function that take as input (1) the output of \code{JGL}, (2) n = vector of sample sizes, (3) S = list of covariance matrices and give in output a criterion to minimize
+  \item{criterion}{
+The criterion for selecting the lambda values. Can be "aic" for the Akaike information criterion (AIC) or "ebic" for the Extended Bayes Information Criterion (EBIC).
+}
+  \item{gamma}{
+The gamma value for the EBIC criterion. A value of 0 results in the BIC.
 }
   \item{globalopt}{
 if TRUE, perform a further step that tries a 2-dimensional optimization of both l1 and l2 using \code{\link{optim}} optimizer, with method \code{optmethod}.
@@ -60,6 +63,8 @@ Other parameters for \code{link{JGL}}. This feature is still in development, it 
 }
 \references{
 Danaher, P., Wang, P., and Witten, D. M. (2014). The joint graphical lasso for inverse covariance estimation across multiple classes. Journal of the Royal Statistical Society: Series B (Statistical Methodology), 76(2), 373-397. http://doi.org/10.1111/rssb.12033
+
+Foygel, R., & Drton, M. (2010, November). Extended Bayesian Information Criteria for Gaussian Graphical Models. In NIPS (pp. 604-612). Chicago
 }
 \author{
 Giulio Costantini
